@@ -9,14 +9,17 @@ import torch.nn.functional as F
 class QNetwork(nn.Module):
     """ This class represents the neural network the agent uses for estimating action values """
 
-    def __init__(self, input_size: int, hidden_sizes: [int], output_size: int) -> None:
+    def __init__(self, input_size: int, hidden_sizes: [int], output_size: int, seed: int) -> None:
         """
         Initializes the layers of the network
         :param input_size: size of the first layer
         :param hidden_sizes: array containing the size for each hidden layer
         :param output_size: size of the output layer
+        :param seed: seed for the model
         """
         super().__init__()
+        self.seed = torch.manual_seed(seed)
+
         self.layers = nn.ModuleList()
 
         # add input layer
