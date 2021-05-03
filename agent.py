@@ -22,6 +22,7 @@ class Agent:
     def __init__(self, state_size: int, action_size: int, hidden_sizes: [int] = (64, 64),
                  gamma: float = 0.99, lr: float = 5e-3, tau: float = 1e-3,
                  eps_start: float = 1.0, eps_dec: float = .9995, eps_min: float = 0.01,
+                 buffer_size: int = 1e5, batch_size: int = 64, update_rate: int = 5,
                  seed: int = int(random.random() * 100)):
         """
         Initializes the agent
@@ -34,14 +35,40 @@ class Agent:
         :param eps_start: epsilon start value
         :param eps_dec: epsilon decay per episode
         :param eps_min: minimum value for epsilon (never stop exploring)
+        :param buffer_size: size of the replay buffer (FIFO)
+        :param batch_size: #todo don't know what this does..
+        :param update_rate: # every nth step after which the networks will be updated
         :param seed: seed to get comparable model runs
         """
-        random.seed(self)
+        random.seed(seed)
         # initialize the deep Q-Network
-        self.local_network = QNetwork(state_size, hidden_sizes, action_size, seed).to(device)
-        self.target_network = QNetwork(state_size, hidden_sizes, action_size, seed).to(device)
+        self.local_network: QNetwork = QNetwork(state_size, hidden_sizes, action_size, seed).to(device)
+        self.target_network: QNetwork = QNetwork(state_size, hidden_sizes, action_size, seed).to(device)
 
+        # initialize optimizer
         self.optimizer = optim.Adam(self.local_network.parameters(), lr=lr)
+
+        # initialize replay memory
+        self.memory: ReplayBuffer = ReplayBuffer(action_size, buffer_size, batch_size)
+
+        # counter increasing at each step
+        self.iter_count = 0
+
+    def reset(self):
+        self.iter_count = 0
+        self.memory.reset()
+
+    def step(self, state: torch.Tensor, action, reward, next_state, done) -> None:
+        """
+        todo: add types, add docs
+        :param state:
+        :param action:
+        :param reward:
+        :param next_state:
+        :param done:
+        :return:
+        """
+        pass
 
 
 class ReplayBuffer:
@@ -63,6 +90,9 @@ class ReplayBuffer:
         """Add a new experience to memory."""
         e = self.experience(state, action, reward, next_state, done)
         self.memory.append(e)
+
+    def reset(self):
+        self.memory.clear()
 
     def sample(self):
         """Randomly sample a batch of experiences from memory."""
