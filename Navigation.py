@@ -33,6 +33,7 @@ def watch_agent(env: UnityEnvironment, brain_name: str, agent: Agent) -> None:
     env_info = env.reset(train_mode=False)[brain_name]  # reset the environment
     state = env_info.vector_observations[0]  # get the current state
     score = 0  # initialize the score
+
     while True:
         action = agent.act(state, epsilon=0)
         env_info = env.step(action)[brain_name]  # send the action to the environment

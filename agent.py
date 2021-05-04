@@ -56,7 +56,12 @@ class Agent:
         :param seed: seed to get comparable model runs
         """
         random.seed(seed)
+        self.state_site = state_size
+        self.action_size = action_size
+        self.hidden_sizes = hidden_sizes
+
         self.gamma: float = gamma
+        self.tau: float = tau
 
         self.update_rate: int = update_rate
         self.batch_size: int = batch_size
@@ -106,7 +111,7 @@ class Agent:
         state = torch.from_numpy(state).float().to(device)
         self.local_network.eval()
         with torch.no_grad():
-            action_values = self.local_network(state)
+            action_values = self.local_network.forward(state)
         self.local_network.train()
 
         if random.random() > epsilon:
@@ -132,6 +137,22 @@ class Agent:
         loss.backward()
         self.optimizer.step()
 
+        # soft update target network
+        self.soft_update(self.local_network, self.target_network, self.tau)
+
+    def soft_update(self, local_model, target_model, tau):
+        """
+        Soft update target network
+
+        θ_target = tau*θ_local + (1 - tau)*θ_target
+
+        :param local_model:
+        :param target_model:
+        :param tau:
+        :return:
+        """
+        for target_param, local_param in zip(target_model.parameters(), local_model.parameters()):
+            target_param.data.copy_(tau * local_param.data + (1.0 - tau) * target_param.data)
 
 
 class ReplayBuffer:

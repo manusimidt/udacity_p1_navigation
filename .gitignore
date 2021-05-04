@@ -3,3 +3,6 @@
 Banana_Linux.zip
 
 *.log
+/__pycache__/
+__pycache__/
+
