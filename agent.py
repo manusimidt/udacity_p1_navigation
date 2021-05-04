@@ -15,7 +15,12 @@ import torch
 import torch.nn.functional as F
 import torch.optim as optim
 
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+"""
+For some reason the pytorch function .to(device) takes forever to execute.
+Probably some issue between my cuda version and the outdated pytorch version (0.4.0) that unityagents requires
+"""
+# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device = torch.device('cpu')
 
 
 class Agent:
@@ -24,7 +29,7 @@ class Agent:
     def __init__(self, state_size: int, action_size: int, hidden_sizes: [int] = (64, 64),
                  gamma: float = 0.99, lr: float = 5e-3, tau: float = 1e-3,
                  eps_start: float = 1.0, eps_dec: float = .9995, eps_min: float = 0.01,
-                 buffer_size: int = 1e5, batch_size: int = 64, update_rate: int = 5,
+                 buffer_size: int = 100000, batch_size: int = 64, update_rate: int = 5,
                  seed: int = int(random.random() * 100)):
         """
         Initializes the agent
@@ -34,9 +39,6 @@ class Agent:
         :param gamma: discount factor for learning
         :param lr: learning rate
         :param tau: #todo don't know what this does, something with soft update?
-        :param eps_start: epsilon start value
-        :param eps_dec: epsilon decay per episode
-        :param eps_min: minimum value for epsilon (never stop exploring)
         :param buffer_size: size of the replay buffer (FIFO)
         :param batch_size: #todo don't know what this does..
         :param update_rate: # every nth step after which the networks will be updated
@@ -44,10 +46,6 @@ class Agent:
         """
         random.seed(seed)
         self.gamma: float = gamma
-
-        self.eps_start: float = eps_start
-        self.eps_dec: float = eps_dec
-        self.eps_min: float = eps_min
 
         self.update_rate: int = update_rate
         self.batch_size: int = batch_size
@@ -69,7 +67,7 @@ class Agent:
         self.iter_count = 0
         self.memory.reset()
 
-    def step(self, state: torch.Tensor, action, reward, next_state, done) -> None:
+    def step(self, state: np.ndarray, action, reward, next_state, done) -> None:
         """
         todo: add types, add docs
         :param state:
@@ -89,18 +87,18 @@ class Agent:
             experiences = self.memory.sample()
             self._learn(experiences)
 
-    def act(self, state) -> int:
+    def act(self, state: np.ndarray, epsilon: float) -> int:
         """
         uses to policy to decide on an action given the state
         :return:
         """
-        state = torch.from_numpy(state).float().unqueeze(0).to(device)
+        state = torch.from_numpy(state).float().to(device)
         self.local_network.eval()
         with torch.no_grad():
             action_values = self.local_network(state)
         self.local_network.train()
 
-        if random.random() > eps:
+        if random.random() > epsilon:
             return np.argmax(action_values.cpu().data.numpy())
         else:
             return random.choice(np.arange(self.action_size))
@@ -112,7 +110,7 @@ class Agent:
 class ReplayBuffer:
     """ FiFo buffer storing experience tuples of the agent """
 
-    def __init__(self, action_size, buffer_size, batch_size):
+    def __init__(self, action_size: int, buffer_size: int, batch_size: int):
         """
         Initialize Buffer
         :param action_size: dimension of each action
