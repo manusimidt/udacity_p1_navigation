@@ -30,7 +30,7 @@ Probably some issue between my cuda version and the outdated pytorch version (0.
 |                               |                      |                  N/A |
 +-------------------------------+----------------------+----------------------+
 """
-#device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 device = torch.device('cpu')
 
 
@@ -38,7 +38,7 @@ class Agent:
     """ This class represents the reinforcement learning agent """
 
     def __init__(self, state_size: int, action_size: int, hidden_sizes: [int] = (64, 64),
-                 gamma: float = 0.99, lr: float = 5e-3, tau: float = 1e-3,
+                 gamma: float = 0.99, lr: float = 0.001, tau: float = 0.001,
                  eps_start: float = 1.0, eps_dec: float = .9995, eps_min: float = 0.01,
                  buffer_size: int = 100000, batch_size: int = 64, update_rate: int = 5,
                  seed: int = int(random.random() * 100)):
@@ -102,6 +102,7 @@ class Agent:
                 len(self.memory) > self.batch_size:
             experiences = self.memory.sample()
             self._learn(experiences)
+        self.iter_count += 1
 
     def act(self, state: np.ndarray, epsilon: float) -> int:
         """

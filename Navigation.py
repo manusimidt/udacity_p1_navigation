@@ -19,6 +19,7 @@ There are 4 possible actions:
     
 Goal: 
     Get an average score of +13 over 100 consecutive episodes
+    Achieve this in less than 1800 episodes
 """
 
 
@@ -68,6 +69,7 @@ def train_agent(env: UnityEnvironment, brain_name: str, agent: Agent, n_episodes
     for i_episode in range(1, n_episodes + 1):
         # reset the environment
         env_info = env.reset(train_mode=True)[brain_name]
+        agent.reset()
         state = env_info.vector_observations[0]
         score = 0
         while True:
@@ -92,6 +94,7 @@ def train_agent(env: UnityEnvironment, brain_name: str, agent: Agent, n_episodes
             print(f"""Episode {i_episode}:
             Epsilon: {eps:.3f}
             Average Score: {np.mean(scores_window):.2f}
+            Weights: {agent.target_network.fc1.weight}
             """)
 
         if np.mean(scores_window) >= 200.0:
@@ -114,9 +117,9 @@ if __name__ == '__main__':
 
     # print("Score of random agent {}".format(watch_random_agent(_env, _brain, _brain_name)))
 
-    _agent = Agent(_state_size, _action_size, seed=0)
+    _agent = Agent(_state_size, _action_size, seed=0, update_rate=10, tau=0.002, gamma=0.992, lr=0.001)
     # watch_agent(_env, _brain_name, _agent)
-    train_agent(_env, _brain_name, _agent, n_episodes=2000)
+    train_agent(_env, _brain_name, _agent, n_episodes=2000, eps_decay=0.996)
     watch_agent(_env, _brain_name, _agent)
 
     _env.close()
