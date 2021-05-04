@@ -18,6 +18,17 @@ import torch.optim as optim
 """
 For some reason the pytorch function .to(device) takes forever to execute.
 Probably some issue between my cuda version and the outdated pytorch version (0.4.0) that unityagents requires
++-----------------------------------------------------------------------------+
+| NVIDIA-SMI 465.19.01    Driver Version: 465.19.01    CUDA Version: 11.3     |
+|-------------------------------+----------------------+----------------------+
+| GPU  Name        Persistence-M| Bus-Id        Disp.A | Volatile Uncorr. ECC |
+| Fan  Temp  Perf  Pwr:Usage/Cap|         Memory-Usage | GPU-Util  Compute M. |
+|                               |                      |               MIG M. |
+|===============================+======================+======================|
+|   0  NVIDIA GeForce ...  On   | 00000000:01:00.0  On |                  N/A |
+|  0%   59C    P0    28W / 130W |    679MiB /  5941MiB |      2%      Default |
+|                               |                      |                  N/A |
++-------------------------------+----------------------+----------------------+
 """
 # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 device = torch.device('cpu')
@@ -99,12 +110,28 @@ class Agent:
         self.local_network.train()
 
         if random.random() > epsilon:
-            return np.argmax(action_values.cpu().data.numpy())
+            return int(np.argmax(action_values.cpu().data.numpy()))
         else:
             return random.choice(np.arange(self.action_size))
 
     def _learn(self, experiences: Tuple[torch.Tensor]):
-        pass
+        states, actions, rewards, next_states, dones = experiences
+
+        # Get max predicted Q values (for next states) from target model
+        Q_targets_next = self.target_network.forward(next_states).detach().max(1)[0].unsqueeze(1)
+        # Compute Q targets for current states
+        Q_targets = rewards + (self.gamma * Q_targets_next * (1 - dones))
+
+        # Get expected Q values from local model
+        Q_expected = self.local_network(states).gather(1, actions)
+
+        # Compute loss
+        loss = F.mse_loss(Q_expected, Q_targets)
+        # Minimize the loss
+        self.optimizer.zero_grad()
+        loss.backward()
+        self.optimizer.step()
+
 
 
 class ReplayBuffer:

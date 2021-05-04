@@ -32,6 +32,8 @@ class QNetwork(nn.Module):
         # add output layer
         self.layers.append(nn.Linear(in_features=hidden_sizes[-1], out_features=output_size))
 
+        self._randomize_weights()
+
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         Do a forward pass through the network
@@ -40,5 +42,10 @@ class QNetwork(nn.Module):
         """
         for layer in self.layers[:-1]:
             x = F.relu(layer(x))
-        out = F.softmax(self.layers[-1](x))
+        out = F.softmax(self.layers[-1](x), dim=0)
         return out
+
+    def _randomize_weights(self) -> None:
+        for layer in self.layers:
+            if type(layer) == nn.Linear:
+                nn.init.uniform_(layer.weight)
