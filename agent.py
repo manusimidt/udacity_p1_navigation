@@ -7,6 +7,8 @@ import numpy as np
 import random
 from collections import namedtuple, deque
 
+from typing import Tuple
+
 from model import QNetwork
 
 import torch
@@ -41,6 +43,15 @@ class Agent:
         :param seed: seed to get comparable model runs
         """
         random.seed(seed)
+        self.gamma: float = gamma
+
+        self.eps_start: float = eps_start
+        self.eps_dec: float = eps_dec
+        self.eps_min: float = eps_min
+
+        self.update_rate: int = update_rate
+        self.batch_size: int = batch_size
+
         # initialize the deep Q-Network
         self.local_network: QNetwork = QNetwork(state_size, hidden_sizes, action_size, seed).to(device)
         self.target_network: QNetwork = QNetwork(state_size, hidden_sizes, action_size, seed).to(device)
@@ -68,6 +79,31 @@ class Agent:
         :param done:
         :return:
         """
+        # save experience to buffer
+        self.memory.add(state, action, reward, next_state, done)
+
+        # after every nth step (n=self.update_rate) take random experiences from
+        # buffer and learn from them
+        if self.iter_count % self.update_rate == 0 and \
+                len(self.memory) > self.batch_size:
+            experiences = self.memory.sample()
+            self._learn(experiences)
+
+    def act(self, state) -> int:
+        """
+        uses to policy to decide on an action given the state
+        :return:
+        """
+        state = torch.from_numpy(state).float().unqueeze(0).to(device)
+        self.local_network.eval()
+        with torch.no_grad():
+            action_values = self.local_network(state)
+        self.local_network.train()
+
+        # todo choose the action epsilon greedy
+
+
+    def _learn(self, experiences: Tuple[torch.Tensor]):
         pass
 
 
