@@ -100,8 +100,10 @@ class Agent:
             action_values = self.local_network(state)
         self.local_network.train()
 
-        # todo choose the action epsilon greedy
-
+        if random.random() > eps:
+            return np.argmax(action_values.cpu().data.numpy())
+        else:
+            return random.choice(np.arange(self.action_size))
 
     def _learn(self, experiences: Tuple[torch.Tensor]):
         pass
