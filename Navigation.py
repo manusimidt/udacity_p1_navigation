@@ -22,26 +22,6 @@ Goal:
 """
 
 
-def watch_random_agent(env: UnityEnvironment, brain: unityagents.BrainParameters, brain_name: str) -> int:
-    # reset the environment
-    env_info = env.reset(train_mode=False)[brain_name]  # reset the environment
-    state: np.ndarray = env_info.vector_observations[0]  # get the current state
-    score = 0  # initialize the score
-    # agent = Agent(state_size=8, action_size=4, seed=0)
-    while True:
-        # action = agent.act(state, 0)  # select an action
-        action = np.random.randint(brain.vector_action_space_size)  # select an action
-        env_info = env.step(action)[brain_name]  # send the action to the environment
-        next_state = env_info.vector_observations[0]  # get the next state
-        reward = env_info.rewards[0]  # get the reward
-        done = env_info.local_done[0]  # see if episode has finished
-        score += reward  # update the score
-        state = next_state  # roll over the state to next time step
-        if done:  # exit loop if episode finished
-            break
-    return score
-
-
 def watch_agent(env: UnityEnvironment, brain_name: str, agent: Agent) -> None:
     """
     Shows agent simulation
@@ -120,7 +100,7 @@ if __name__ == '__main__':
 
     # print("Score of random agent {}".format(watch_random_agent(_env, _brain, _brain_name)))
 
-    agent = Agent(state_size=_state_size, action_size=_action_size, seed=0)
-    watch_agent(_env, _brain_name, agent)
+    _agent = Agent(state_size=_state_size, action_size=_action_size, seed=0)
+    watch_agent(_env, _brain_name, _agent)
 
     _env.close()
