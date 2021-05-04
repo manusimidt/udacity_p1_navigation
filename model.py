@@ -19,7 +19,11 @@ class QNetwork(nn.Module):
         """
         super().__init__()
         self.seed = torch.manual_seed(seed)
+        self.fc1 = nn.Linear(input_size, hidden_sizes[0])
+        self.fc2 = nn.Linear(hidden_sizes[0], hidden_sizes[1])
+        self.fc3 = nn.Linear(hidden_sizes[1], output_size)
 
+        """
         self.layers = nn.ModuleList()
 
         # add input layer
@@ -31,6 +35,7 @@ class QNetwork(nn.Module):
 
         # add output layer
         self.layers.append(nn.Linear(in_features=hidden_sizes[-1], out_features=output_size))
+        """
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -38,7 +43,10 @@ class QNetwork(nn.Module):
         :param x: data to pass through the network
         :return:
         """
-        for layer in self.layers[:-1]:
-            x = F.relu(layer(x))
-        out = F.softmax(self.layers[-1](x), dim=0)
-        return out
+        # for layer in self.layers[:-1]:
+        #     x = F.relu(layer(x))
+        # out = F.softmax(self.layers[-1](x), dim=0)
+        # return out
+        x = F.relu(self.fc1(x))
+        x = F.relu(self.fc2(x))
+        return self.fc3(x)

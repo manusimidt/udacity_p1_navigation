@@ -30,7 +30,7 @@ Probably some issue between my cuda version and the outdated pytorch version (0.
 |                               |                      |                  N/A |
 +-------------------------------+----------------------+----------------------+
 """
-# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+#device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 device = torch.device('cpu')
 
 

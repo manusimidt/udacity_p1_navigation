@@ -89,7 +89,11 @@ def train_agent(env: UnityEnvironment, brain_name: str, agent: Agent, n_episodes
         eps = max(eps_end, eps_decay * eps)  # decrease epsilon
 
         if i_episode % 10 == 0:
-            print('\rEpisode {}\tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_window)))
+            print(f"""Episode {i_episode}:
+            Epsilon: {eps:.3f}
+            Average Score: {np.mean(scores_window):.2f}
+            """)
+
         if np.mean(scores_window) >= 200.0:
             print('\nEnvironment solved in {:d} episodes!\tAverage Score: {:.2f}'.format(i_episode - 100,
                                                                                          np.mean(scores_window)))
