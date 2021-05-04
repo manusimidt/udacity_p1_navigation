@@ -47,11 +47,12 @@ def watch_agent(env: UnityEnvironment, brain_name: str, agent: Agent) -> None:
     print(f"Agent achieved a score of {score}")
 
 
-def train_agent(env: UnityEnvironment, agent: Agent, n_episodes: int,
+def train_agent(env: UnityEnvironment, brain_name: str, agent: Agent, n_episodes: int,
                 eps_start=1.0, eps_end=0.01, eps_decay=0.995) -> []:
     """
     Trans the agent for n episodes
     :param env:
+    :param brain_name:
     :param agent:
     :param n_episodes: number of episodes to train
     :param eps_start: epsilon start value
@@ -65,21 +66,29 @@ def train_agent(env: UnityEnvironment, agent: Agent, n_episodes: int,
     scores_window = deque(maxlen=100)
 
     for i_episode in range(1, n_episodes + 1):
-        state = env.reset()
+        # reset the environment
+        env_info = env.reset(train_mode=True)[brain_name]
+        state = env_info.vector_observations[0]
         score = 0
         while True:
             action: int = agent.act(state, eps)
-            next_state, reward, done, _ = env.step(action)
-            agent.step(state, action, reward, next_state, done)
-            state = next_state
+            env_info = env.step(action)[brain_name]
+            next_state = env_info.vector_observations[0]
+            reward = env_info.rewards[0]
+            done = env_info.local_done[0]
             score += reward
+            state = next_state
+
+            agent.step(state, action, reward, next_state, done)
+
             if done:
                 break
+
         scores_window.append(score)  # save most recent score
         scores.append(score)  # save most recent score
         eps = max(eps_end, eps_decay * eps)  # decrease epsilon
 
-        if i_episode % 100 == 0:
+        if i_episode % 10 == 0:
             print('\rEpisode {}\tAverage Score: {:.2f}'.format(i_episode, np.mean(scores_window)))
         if np.mean(scores_window) >= 200.0:
             print('\nEnvironment solved in {:d} episodes!\tAverage Score: {:.2f}'.format(i_episode - 100,
@@ -101,7 +110,9 @@ if __name__ == '__main__':
 
     # print("Score of random agent {}".format(watch_random_agent(_env, _brain, _brain_name)))
 
-    _agent = Agent(state_size=_state_size, action_size=_action_size, seed=0)
+    _agent = Agent(_state_size, _action_size, seed=0)
+    # watch_agent(_env, _brain_name, _agent)
+    train_agent(_env, _brain_name, _agent, n_episodes=2000)
     watch_agent(_env, _brain_name, _agent)
 
     _env.close()
