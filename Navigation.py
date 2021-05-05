@@ -1,3 +1,4 @@
+""" Author: Manuel Schmidt """
 from collections import deque
 
 import torch
@@ -8,6 +9,7 @@ import numpy as np
 from agent import Agent
 
 """
+
 The state space is a ndarray of length 37
 There are 4 possible actions:
     0 - move forward
@@ -97,7 +99,7 @@ def train_agent(env: UnityEnvironment, brain_name: str, agent: Agent, n_episodes
             Average Score: {np.mean(scores_window):.2f}
             """)
 
-        if np.mean(scores_window) >= 200.0:
+        if np.mean(scores_window) >= 16.0:
             print('\nEnvironment solved in {:d} episodes!\tAverage Score: {:.2f}'.format(i_episode - 100,
                                                                                          np.mean(scores_window)))
             torch.save(agent.local_network.state_dict(), 'checkpoint.pth')
@@ -117,9 +119,12 @@ if __name__ == '__main__':
 
     # print("Score of random agent {}".format(watch_random_agent(_env, _brain, _brain_name)))
 
-    _agent = Agent(_state_size, _action_size, seed=0, update_rate=10, tau=0.002, gamma=0.992, lr=0.001)
+    _agent = Agent(_state_size, _action_size, hidden_sizes=[32, 64, 32], seed=0,
+                   gamma=0.992, lr=0.005,
+                   buffer_size=100000, update_rate=10, tau=0.002)
     # watch_agent(_env, _brain_name, _agent)
-    train_agent(_env, _brain_name, _agent, n_episodes=2000, eps_decay=0.996)
+    train_agent(_env, _brain_name, _agent, n_episodes=2000,
+                eps_decay=0.995)
     watch_agent(_env, _brain_name, _agent)
 
     _env.close()
