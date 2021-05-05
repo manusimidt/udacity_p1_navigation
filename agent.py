@@ -76,12 +76,9 @@ class Agent:
         # initialize replay memory
         self.memory: ReplayBuffer = ReplayBuffer(action_size, buffer_size, batch_size)
 
-        # counter increasing at each step
-        self.iter_count = 0
+        # Used to determine when the agent starts learning
+        self.t_step = 0
 
-    def reset(self):
-        self.iter_count = 0
-        self.memory.reset()
 
     def step(self, state: np.ndarray, action, reward, next_state, done) -> None:
         """
@@ -96,13 +93,13 @@ class Agent:
         # save experience to buffer
         self.memory.add(state, action, reward, next_state, done)
 
-        # after every nth step (n=self.update_rate) take random experiences from
+        self.t_step = (self.t_step + 1) % self.update_rate
+
+        # at every nth step (n=self.update_rate) take random experiences from
         # buffer and learn from them
-        if self.iter_count % self.update_rate == 0 and \
-                len(self.memory) > self.batch_size:
+        if self.t_step == 0 and len(self.memory) > self.batch_size:
             experiences = self.memory.sample()
             self._learn(experiences)
-        self.iter_count += 1
 
     def act(self, state: np.ndarray, epsilon: float) -> int:
         """

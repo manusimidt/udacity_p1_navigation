@@ -69,9 +69,10 @@ def train_agent(env: UnityEnvironment, brain_name: str, agent: Agent, n_episodes
     for i_episode in range(1, n_episodes + 1):
         # reset the environment
         env_info = env.reset(train_mode=True)[brain_name]
-        agent.reset()
         state = env_info.vector_observations[0]
         score = 0
+
+        # the environment will end the episode after n steps, thus no manual termination of the episode is needed
         while True:
             action: int = agent.act(state, eps)
             env_info = env.step(action)[brain_name]
@@ -79,10 +80,10 @@ def train_agent(env: UnityEnvironment, brain_name: str, agent: Agent, n_episodes
             reward = env_info.rewards[0]
             done = env_info.local_done[0]
             score += reward
-            state = next_state
 
             agent.step(state, action, reward, next_state, done)
 
+            state = next_state
             if done:
                 break
 
@@ -94,7 +95,6 @@ def train_agent(env: UnityEnvironment, brain_name: str, agent: Agent, n_episodes
             print(f"""Episode {i_episode}:
             Epsilon: {eps:.3f}
             Average Score: {np.mean(scores_window):.2f}
-            Weights: {agent.target_network.fc1.weight}
             """)
 
         if np.mean(scores_window) >= 200.0:
