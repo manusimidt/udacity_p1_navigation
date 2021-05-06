@@ -26,7 +26,19 @@ Goal:
 """
 
 
-def
+def watch_agent_from_pth_file(env: UnityEnvironment, brain_name: str, agent: Agent, file_path: str) -> None:
+    """
+    Loads the weights for the Q Networks from the given path and runs the simulation
+    :param env:
+    :param brain_name:
+    :param agent:
+    :param file_path:
+    :return:
+    """
+    agent.local_network.load_state_dict(torch.load(file_path))
+    agent.local_network.eval()
+    watch_agent(env, brain_name, agent)
+
 
 def watch_agent(env: UnityEnvironment, brain_name: str, agent: Agent) -> None:
     """
@@ -41,7 +53,7 @@ def watch_agent(env: UnityEnvironment, brain_name: str, agent: Agent) -> None:
     score = 0  # initialize the score
 
     while True:
-        action = agent.act(state, epsilon=0)
+        action = agent.act(state, epsilon=0.05)
         env_info = env.step(action)[brain_name]  # send the action to the environment
         next_state = env_info.vector_observations[0]  # get the next state
         reward = env_info.rewards[0]  # get the reward
@@ -102,7 +114,7 @@ def train_agent(env: UnityEnvironment, brain_name: str, agent: Agent, n_episodes
             Average Score: {np.mean(scores_window):.2f}
             """)
 
-        if np.mean(scores_window) >= 16.0:
+        if np.mean(scores_window) >= 14.0:
             print('\nEnvironment solved in {:d} episodes!\tAverage Score: {:.2f}'.format(i_episode - 100,
                                                                                          np.mean(scores_window)))
             torch.save(agent.local_network.state_dict(), f'checkpoint-{np.mean(scores_window):.2f}.pth')
@@ -154,11 +166,15 @@ if __name__ == '__main__':
     _agent = Agent(_state_size, _action_size, hidden_sizes=[64, 64], seed=0,
                    gamma=0.992, lr=0.005,
                    buffer_size=100000, update_rate=10, tau=0.002)
-    # watch_agent(_env, _brain_name, _agent)
-    scores = train_agent(_env, _brain_name, _agent, n_episodes=1000,
-                         eps_decay=0.995)
-    watch_agent(_env, _brain_name, _agent)
 
-    plot_scores(scores=scores)
+    watch_only = False
+    if watch_only:
+        watch_agent_from_pth_file(_env, _brain_name, _agent, './docs/assets/run-2021-05-06-09-14.pth')
+    else:
+
+        scores = train_agent(_env, _brain_name, _agent, n_episodes=1000,
+                             eps_decay=0.995)
+        watch_agent(_env, _brain_name, _agent)
+        plot_scores(scores=scores)
 
     _env.close()
