@@ -37,7 +37,7 @@ device = torch.device('cpu')
 class Agent:
     """ This class represents the reinforcement learning agent """
 
-    def __init__(self, state_size: int, action_size: int, hidden_sizes: [int] = (64, 64),
+    def __init__(self, state_size: int, action_size: int, hidden_sizes: [int] = (64,),
                  gamma: float = 0.99, lr: float = 0.001, tau: float = 0.001,
                  buffer_size: int = 100000, batch_size: int = 64, update_rate: int = 5,
                  seed: int = int(random.random() * 100)):
@@ -55,9 +55,9 @@ class Agent:
         :param seed: seed to get comparable model runs
         """
         random.seed(seed)
-        self.state_site = state_size
-        self.action_size = action_size
-        self.hidden_sizes = hidden_sizes
+        self.state_site:int = state_size
+        self.action_size:int = action_size
+        self.hidden_sizes:[int] = hidden_sizes
 
         self.gamma: float = gamma
         self.tau: float = tau

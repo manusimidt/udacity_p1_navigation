@@ -5,7 +5,7 @@ import torch
 import unityagents
 from unityagents import UnityEnvironment
 import numpy as np
-
+import matplotlib.pyplot as plt
 from agent import Agent
 
 """
@@ -61,7 +61,7 @@ def train_agent(env: UnityEnvironment, brain_name: str, agent: Agent, n_episodes
     :param eps_start: epsilon start value
     :param eps_end: epsilon decay per episode
     :param eps_decay: minimum value for epsilon (never stop exploring)
-    :return:
+    :return: returns an array containing the score of every episode
     """
     scores: [int] = []
     eps = eps_start
@@ -107,6 +107,23 @@ def train_agent(env: UnityEnvironment, brain_name: str, agent: Agent, n_episodes
     return scores
 
 
+def plot_scores(scores: [int], sma_window: int = 0) -> None:
+    """
+    Plots a line plot of the scores.
+    The function expects the score of the first episode at scores[0] and the last episode at scores[-1]
+    :param scores:
+    :param sma_window: Simple Moving Average rolling window
+    :return:
+    """
+    # plot the scores
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    plt.plot(np.arange(len(scores)), scores)
+    plt.ylabel('Score')
+    plt.xlabel('Episode #')
+    plt.show()
+
+
 if __name__ == '__main__':
     _env = UnityEnvironment(file_name="./Banana_Linux/Banana.x86_64")
 
@@ -119,12 +136,14 @@ if __name__ == '__main__':
 
     # print("Score of random agent {}".format(watch_random_agent(_env, _brain, _brain_name)))
 
-    _agent = Agent(_state_size, _action_size, hidden_sizes=[32, 64, 32], seed=0,
+    _agent = Agent(_state_size, _action_size, hidden_sizes=[64], seed=0,
                    gamma=0.992, lr=0.005,
                    buffer_size=100000, update_rate=10, tau=0.002)
     # watch_agent(_env, _brain_name, _agent)
-    train_agent(_env, _brain_name, _agent, n_episodes=2000,
-                eps_decay=0.995)
+    scores = train_agent(_env, _brain_name, _agent, n_episodes=2000,
+                         eps_decay=0.995)
     watch_agent(_env, _brain_name, _agent)
+
+    plot_scores(scores=scores)
 
     _env.close()
