@@ -66,7 +66,7 @@ def watch_agent(env: UnityEnvironment, brain_name: str, agent: Agent) -> None:
 
 
 def train_agent(env: UnityEnvironment, brain_name: str, agent: Agent, n_episodes: int,
-                eps_start=1.0, eps_cutoff:int = 2000,eps_end=0.01, eps_decay=0.995) -> []:
+                eps_start=1.0, eps_cutoff: int = 2000, eps_end=0.01, eps_decay=0.995) -> []:
     """
     Trans the agent for n episodes
     :param env:
@@ -107,6 +107,7 @@ def train_agent(env: UnityEnvironment, brain_name: str, agent: Agent, n_episodes
 
         scores_window.append(score)  # save most recent score
         scores.append(score)  # save most recent score
+
         if i_episode >= eps_cutoff:
             eps = eps_end
         else:
@@ -119,7 +120,7 @@ def train_agent(env: UnityEnvironment, brain_name: str, agent: Agent, n_episodes
             """)
 
         if np.mean(scores_window) >= 14.0:
-            print('\nEnvironment solved in {:d} episodes!\tAverage Score: {:.2f}'.format(i_episode - 100,
+            print('\nEnvironment solved in {:d} episodes!\tAverage Score: {:.2f}'.format(i_episode,
                                                                                          np.mean(scores_window)))
             torch.save(agent.local_network.state_dict(), f'checkpoint-{np.mean(scores_window):.2f}.pth')
             break
@@ -166,19 +167,19 @@ if __name__ == '__main__':
 
     _action_size: int = 4
     _state_size: int = 37
-    # first layer 70 Nodes -> after 300 Episodes average score of 8.62
-    _agent = Agent(_state_size, _action_size, hidden_sizes=[75,64],
+
+    _agent = Agent(_state_size, _action_size, hidden_sizes=[70, 64],
                    gamma=0.992, lr=0.0005, tau=0.002,
                    buffer_size=100000, batch_size=64, update_rate=10,
                    seed=0)
 
-    watch_only = False
+    watch_only = True
     if watch_only:
-        watch_agent_from_pth_file(_env, _brain_name, _agent, './docs/assets/run-2021-05-06-09-14.pth')
+        watch_agent_from_pth_file(_env, _brain_name, _agent, './docs/assets/run-2021-05-06-14-06.pth')
     else:
 
         scores = train_agent(_env, _brain_name, _agent, n_episodes=1000,
-                             eps_start=1, eps_decay=0.995, eps_end=0.01)
+                             eps_start=1, eps_decay=0.995, eps_cutoff=500, eps_end=0.01)
         watch_agent(_env, _brain_name, _agent)
         plot_scores(scores=scores)
 
