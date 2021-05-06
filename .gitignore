@@ -1,7 +1,8 @@
 .idea
 /Banana_Linux
 Banana_Linux.zip
-
+/Banana_Windows_x86_64
+.ipynb_checkpoints
 *.log
 /__pycache__/
 __pycache__/
