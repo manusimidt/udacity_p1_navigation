@@ -119,7 +119,7 @@ def train_agent(env: UnityEnvironment, brain_name: str, agent: Agent, n_episodes
             Average Score: {np.mean(scores_window):.2f}
             """)
 
-        if np.mean(scores_window) >= 14.0:
+        if np.mean(scores_window) >= 13.0:
             print('\nEnvironment solved in {:d} episodes!\tAverage Score: {:.2f}'.format(i_episode,
                                                                                          np.mean(scores_window)))
             torch.save(agent.local_network.state_dict(), f'checkpoint-{np.mean(scores_window):.2f}.pth')
@@ -179,7 +179,7 @@ if __name__ == '__main__':
     else:
 
         scores = train_agent(_env, _brain_name, _agent, n_episodes=1000,
-                             eps_start=1, eps_decay=0.995, eps_cutoff=500, eps_end=0.01)
+                             eps_start=1, eps_decay=0.995, eps_cutoff=420, eps_end=0.01)
         watch_agent(_env, _brain_name, _agent)
         plot_scores(scores=scores)
 

@@ -16,6 +16,7 @@
 % Packages
 \usepackage{amsmath}
 \usepackage[hscale=0.8,vscale=0.8]{geometry}
+\usepackage{amsfonts}
 
 % Document
 \begin{document}
@@ -29,10 +30,10 @@
     The goal of the agent is to maximize the cumulative reward.
     \\
     In this particular project the agent uses Q-Networks to be able to easily deal with a big set of possible states $S$.
-    Q-Network's are deep neural networks that serve as a nonlinear function approximator and are trying to find the best action value function.
-    This means the Q-Network tries to estimate the expected sum of future rewards (discounted by \gamma) for a given state action pair.
-
-
+    Q-Network's are deep neural networks that serve as a nonlinear function approximator which are trying to find the best action value function.
+    This means the Q-Network tries to estimate the expected sum of future rewards (discounted by $\gamma$) for a given state action pair.
+    $$Q_{\pi}(s,a)=\mathbb{E}[\gamma ^{0}R_{1}+\gamma ^{1}R_{2}+\gamma ^{2}R_{3}+...|S_{0}=s, A_{0}=a, \pi]$$
+    \\
     Due to the unstable nature of nonlinear functions there are multiple additions of the Deep Q-learning Algorithm to increase the stability.
     This project implements the following two:
     \\\\
@@ -41,13 +42,21 @@
     Sample n random elements from the buffer at xth every time step and learn from them.
     \\\\
     \textbf{Double DQN:}
-    Use two neural networks to select the best action in order to prevent the algorithm from propagating incidental high rewards received by chance.
+    Use two neural networks instead of one to select the best action in order to prevent the algorithm from propagating incidental high rewards received by chance.
+    The target network is updated
 
 
     \section{Results}\label{sec:results}
 
 
     \section{Ideas for future improvements}\label{sec:ideas}
+    One way to improve the Model is always to fine tune the hyper parameters.
+    Additionally, it is possible to implement additional algorithms that help to improve and stabilize the DQN algorithm.
+    Such additions would be "Dueling DQN", "Distributional DQN" and "Noisy DQN".
+    \\\\
+    Moreover I noticed that with the given environment states from the unity engine it seems that the agent is not able
+    to detect bananas that are very far away.
+    Thus, using actual pixel values as input could also improve performance in this particular case.
 
 
 \end{document}
