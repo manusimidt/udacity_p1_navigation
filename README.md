@@ -12,7 +12,7 @@
 
 ### Introduction
 
-For this project, you will train an agent to navigate (and collect bananas!) in a large, square world.
+In this project, you will train an agent to navigate (and collect bananas!) in a large, square world.
 
 ![Trained Agent][image1]
 
@@ -29,7 +29,13 @@ actions are available, corresponding to:
 - **`3`** - turn right.
 
 The task is episodic, and in order to solve the environment, your agent must get an average score of +13 over 100
-consecutive episodes.
+consecutive episodes. This means the agent must collect on average at least 13 yellow bananas without running into a
+blue one.
+
+### Example of a trained Model
+
+(I trained this one longer than required by project requirements)
+![trained agent](docs/assets/trained-agent.gif)
 
 ### Getting Started
 
@@ -79,4 +85,33 @@ consecutive episodes.
 
 3. Run the `Navigation.py` file or start a jupyter server and run `Navigation.ipynd`
 
-![trained agent](docs/assets/trained-agent.gif)
+### Instructions
+
+As mentioned in Point 3 in the Installation Instructions you can either run the jupyter notebook `Navigation.ipynd`, or
+the python script `Navigation.py`. After initializing the UnityEnvironment, a Agent object instance is created. All
+hyperparameters attributable to the Agent can be set over the constructor.
+
+```python
+agent = Agent(state_size, action_size, hidden_sizes=[70, 64],
+              gamma=0.992, lr=0.0005, tau=0.002,
+              buffer_size=100000, batch_size=64, update_rate=10,
+              seed=0)
+```
+
+After creating the agent instance you can either train the agent by passing it to the
+`train_agent()`function, or you can watch the agent interacting with its environment by calling the `watch_agent()`
+function. If you want to load the weights for the local network you can also call the `watch_agent_from_pth_file()`
+function.
+
+```python
+# with this boolean you can decide if you just want to watch an agent or train the agent yourself
+watch_only = True
+if watch_only:
+    watch_agent_from_pth_file(_env, _brain_name, _agent, './checkpoint.pth')
+else:
+    scores = train_agent(_env, _brain_name, _agent, n_episodes=1000,
+                         eps_start=1, eps_decay=0.995, eps_cutoff=420, eps_end=0.01)
+    watch_agent(_env, _brain_name, _agent)
+    plot_scores(scores=scores)
+```
+
