@@ -66,7 +66,7 @@ def watch_agent(env: UnityEnvironment, brain_name: str, agent: Agent) -> None:
 
 
 def train_agent(env: UnityEnvironment, brain_name: str, agent: Agent, n_episodes: int,
-                eps_start=1.0, eps_end=0.01, eps_decay=0.995) -> []:
+                eps_start=1.0, eps_cutoff:int = 2000,eps_end=0.01, eps_decay=0.995) -> []:
     """
     Trans the agent for n episodes
     :param env:
@@ -74,6 +74,7 @@ def train_agent(env: UnityEnvironment, brain_name: str, agent: Agent, n_episodes
     :param agent:
     :param n_episodes: number of episodes to train
     :param eps_start: epsilon start value
+    :param eps_cutoff: after x episodes, immediately decrease epsilon to eps_end
     :param eps_end: epsilon decay per episode
     :param eps_decay: minimum value for epsilon (never stop exploring)
     :return: returns an array containing the score of every episode
@@ -106,7 +107,10 @@ def train_agent(env: UnityEnvironment, brain_name: str, agent: Agent, n_episodes
 
         scores_window.append(score)  # save most recent score
         scores.append(score)  # save most recent score
-        eps = max(eps_end, eps_decay * eps)  # decrease epsilon
+        if i_episode >= eps_cutoff:
+            eps = eps_end
+        else:
+            eps = max(eps_end, eps_decay * eps)  # decrease epsilon
 
         if i_episode % 10 == 0:
             print(f"""Episode {i_episode}:
@@ -162,8 +166,8 @@ if __name__ == '__main__':
 
     _action_size: int = 4
     _state_size: int = 37
-
-    _agent = Agent(_state_size, _action_size, hidden_sizes=[70,64],
+    # first layer 70 Nodes -> after 300 Episodes average score of 8.62
+    _agent = Agent(_state_size, _action_size, hidden_sizes=[75,64],
                    gamma=0.992, lr=0.0005, tau=0.002,
                    buffer_size=100000, batch_size=64, update_rate=10,
                    seed=0)
