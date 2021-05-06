@@ -69,6 +69,8 @@ class Agent:
         self.local_network: QNetwork = QNetwork(state_size, hidden_sizes, action_size, seed).to(device)
         self.target_network: QNetwork = QNetwork(state_size, hidden_sizes, action_size, seed).to(device)
 
+        print(self.local_network)
+
         # initialize optimizer
         self.optimizer = optim.Adam(self.local_network.parameters(), lr=lr)
 

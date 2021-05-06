@@ -1,6 +1,7 @@
 """ Author: Manuel Schmidt """
 from collections import deque
 
+import pandas as pd
 import torch
 import unityagents
 from unityagents import UnityEnvironment
@@ -24,6 +25,8 @@ Goal:
     Achieve this in less than 1800 episodes
 """
 
+
+def
 
 def watch_agent(env: UnityEnvironment, brain_name: str, agent: Agent) -> None:
     """
@@ -102,12 +105,12 @@ def train_agent(env: UnityEnvironment, brain_name: str, agent: Agent, n_episodes
         if np.mean(scores_window) >= 16.0:
             print('\nEnvironment solved in {:d} episodes!\tAverage Score: {:.2f}'.format(i_episode - 100,
                                                                                          np.mean(scores_window)))
-            torch.save(agent.local_network.state_dict(), 'checkpoint.pth')
+            torch.save(agent.local_network.state_dict(), f'checkpoint-{np.mean(scores_window):.2f}.pth')
             break
     return scores
 
 
-def plot_scores(scores: [int], sma_window: int = 0) -> None:
+def plot_scores(scores: [int], sma_window: int = 50) -> None:
     """
     Plots a line plot of the scores.
     The function expects the score of the first episode at scores[0] and the last episode at scores[-1]
@@ -115,12 +118,26 @@ def plot_scores(scores: [int], sma_window: int = 0) -> None:
     :param sma_window: Simple Moving Average rolling window
     :return:
     """
+    # calculate moving average of the scores
+    series: pd.Series = pd.Series(scores)
+    window = series.rolling(window=sma_window)
+    scores_sma: pd.Series = window.mean()
+
     # plot the scores
-    fig = plt.figure()
-    ax = fig.add_subplot(111)
-    plt.plot(np.arange(len(scores)), scores)
-    plt.ylabel('Score')
-    plt.xlabel('Episode #')
+    fig = plt.figure(figsize=(12, 5))
+
+    plot1 = fig.add_subplot(121)
+    plot1.plot(np.arange(len(scores)), scores)
+    plot1.set_ylabel('Score')
+    plot1.set_xlabel('Episode #')
+    plot1.set_title("Raw scores")
+
+    plot2 = fig.add_subplot(122)
+    plot2.plot(np.arange(len(scores_sma)), scores_sma)
+    plot2.set_ylabel('Score')
+    plot2.set_xlabel('Episode #')
+    plot2.set_title(f"Moving Average(window={sma_window})")
+
     plt.show()
 
 
@@ -134,13 +151,11 @@ if __name__ == '__main__':
     _action_size: int = 4
     _state_size: int = 37
 
-    # print("Score of random agent {}".format(watch_random_agent(_env, _brain, _brain_name)))
-
-    _agent = Agent(_state_size, _action_size, hidden_sizes=[64], seed=0,
+    _agent = Agent(_state_size, _action_size, hidden_sizes=[64, 64], seed=0,
                    gamma=0.992, lr=0.005,
                    buffer_size=100000, update_rate=10, tau=0.002)
     # watch_agent(_env, _brain_name, _agent)
-    scores = train_agent(_env, _brain_name, _agent, n_episodes=2000,
+    scores = train_agent(_env, _brain_name, _agent, n_episodes=1000,
                          eps_decay=0.995)
     watch_agent(_env, _brain_name, _agent)
 
