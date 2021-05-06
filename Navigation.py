@@ -163,9 +163,10 @@ if __name__ == '__main__':
     _action_size: int = 4
     _state_size: int = 37
 
-    _agent = Agent(_state_size, _action_size, hidden_sizes=[64, 64], seed=0,
-                   gamma=0.992, lr=0.005,
-                   buffer_size=100000, update_rate=10, tau=0.002)
+    _agent = Agent(_state_size, _action_size, hidden_sizes=[70,64],
+                   gamma=0.992, lr=0.0005, tau=0.002,
+                   buffer_size=100000, batch_size=64, update_rate=10,
+                   seed=0)
 
     watch_only = False
     if watch_only:
@@ -173,7 +174,7 @@ if __name__ == '__main__':
     else:
 
         scores = train_agent(_env, _brain_name, _agent, n_episodes=1000,
-                             eps_decay=0.995)
+                             eps_start=1, eps_decay=0.995, eps_end=0.01)
         watch_agent(_env, _brain_name, _agent)
         plot_scores(scores=scores)
 
