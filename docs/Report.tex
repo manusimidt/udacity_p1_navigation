@@ -15,8 +15,10 @@
 
 % Packages
 \usepackage{amsmath}
+\usepackage{float}
 \usepackage[hscale=0.8,vscale=0.8]{geometry}
 \usepackage{amsfonts}
+\usepackage{graphicx}
 
 % Document
 \begin{document}
@@ -47,6 +49,19 @@
 
 
     \section{Results}\label{sec:results}
+    For this Project I tried many runs with different hyper parameters.
+    I also tried to change the architecture of the neural networks.
+    But as I added more layers/more nodes per layer I noticed that this dramatically decreased the performance of the agent.
+    Probably because I would also have to change other hyperparameters such as the learning rate accordingly.
+    \\
+    One trend I noticed was that each time I increased the number of nodes per layer, the resulting score plot fluctuated much more around the mean.
+    This is probably because as the dimensionality of the action value function (characterized by the Q network) increases, the network also looses stability when trained with unchanged hyperparameters.
+
+    \begin{figure}[H]
+        \includegraphics[width=\linewidth]{assets/run-2021-05-06-14-06}
+        \caption{Scores that the agent achieved per episode}
+        \label{fig:scores}
+    \end{figure}
 
 
     \section{Ideas for future improvements}\label{sec:ideas}
@@ -56,7 +71,7 @@
     \\\\
     Moreover I noticed that with the given environment states from the unity engine it seems that the agent is not able
     to detect bananas that are very far away.
-    Thus, using actual pixel values as input could also improve performance in this particular case.
+    Thus, using actual pixel values as input might also improve performance in this particular case.
 
 
 \end{document}
