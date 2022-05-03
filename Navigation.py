@@ -159,7 +159,8 @@ def plot_scores(scores: [int], sma_window: int = 50) -> None:
 
 
 if __name__ == '__main__':
-    _env = UnityEnvironment(file_name="./Banana_Linux/Banana.x86_64")
+    # _env = UnityEnvironment(file_name="./Banana_Linux/Banana.x86_64")
+    _env = UnityEnvironment(file_name="./Banana_Windows_x86_64/Banana.exe")
 
     # get the default brain
     _brain_name: str = _env.brain_names[0]
