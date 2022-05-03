@@ -56,6 +56,36 @@
     \\
     One trend I noticed was that each time I increased the number of nodes per layer, the resulting score plot fluctuated much more around the mean.
     This is probably because as the dimensionality of the action value function (characterized by the Q network) increases, the network also looses stability when trained with unchanged hyperparameters.
+    After trying out multiple network architectures I settled on the following three fully connected layers:
+    \\
+    \begin{center}
+        \begin{tabular}{||c c c c||}
+            \hline
+            Layer Nr. & Input size & Output size & Bias \\ [0.5ex]
+            \hline\hline
+            0         & 37         & 70          & yes  \\
+            \hline
+            1         & 80         & 64          & yes  \\
+            \hline
+            2         & 64         & 4           & yes \\ [1ex]
+            \hline
+        \end{tabular}
+    \end{center}
+    \newpage
+
+    \noindent Additionally I tried to improve the decaying of epsilon for the epsilon greedy algorithm.
+    The original implementation from the textbook is as follows:
+    $$\varepsilon = max(\varepsilon_{0} * d^{i}, \varepsilon_{min})$$
+    where $d$ is the decay rate for $\varepsilon$ and $i$ is the number of episodes.
+    In order to get the last bit of performance out of my policy I introduced a new parameter called ``eps cutoff''.
+    This parameter $i_{cutt}$ is simply the number of episodes after which $\varepsilon$ is set to $\varepsilon_{min}$.
+
+    $$\varepsilon = \begin{cases}
+                        & max(\varepsilon_{0} * d^{i}, \varepsilon_{min}) \text{ if } \varepsilon < i_{cutt} \\
+                        & \varepsilon_{min} \text{ if } \varepsilon \geq  i_{cutt}
+    \end{cases}$$
+
+    \noindent The sharp increase which is visible in the smoothed score chart in Figure 1 might be attributable to the epsilon cutoff, but I am not entirely sure.
 
     \begin{figure}[H]
         \includegraphics[width=\linewidth]{assets/run-2021-05-06-14-06}

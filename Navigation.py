@@ -174,11 +174,11 @@ if __name__ == '__main__':
                    buffer_size=100000, batch_size=64, update_rate=10,
                    seed=0)
 
+    # with this boolean you can decide if you just want to watch an agent or train the agent yourself
     watch_only = True
     if watch_only:
         watch_agent_from_pth_file(_env, _brain_name, _agent, './docs/assets/run-2021-05-06-14-06.pth')
     else:
-
         scores = train_agent(_env, _brain_name, _agent, n_episodes=1000,
                              eps_start=1, eps_decay=0.995, eps_cutoff=420, eps_end=0.01)
         watch_agent(_env, _brain_name, _agent)
